@@ -8,3 +8,5 @@ typedef struct timeSeries{
 int readit(char *filename, timeSeries *timeSeries);
 int eigenCompute(timeSeries *timeSeries);
 int optimizer(timeSeries *timeSeries, int max_names);
+int longshort(timeSeries *timeSeries);
+int readportfolio(const char *portfolioFile, double *positions);

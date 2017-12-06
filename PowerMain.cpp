@@ -9,11 +9,12 @@ int main(int argc, char **argv)
     timeSeries *myTimeSeries;
     myTimeSeries = (struct timeSeries *)calloc(1, sizeof(struct timeSeries));
     FILE *covariance_matrix, *returns_file;
+    int file2 = 0; // to indicate whether second file is present
     const char *covarianceFilename = "cov_mat.csv";
     const char *returnsFilename = "returns_file.csv";
     
-    if ((argc < 2 ) || (argc > 3)){
-	  printf("usage: PowerMethod filename [max_names]\n");  retcode = 1;
+    if ((argc < 2 ) || (argc > 4)){
+	  printf("usage: PowerMethod filename [max_names] [filename2]\n");  retcode = 1;
 	  goto BACK;
     }
 
@@ -22,12 +23,35 @@ int main(int argc, char **argv)
         max_names = atoi(argv[2]);
         printf("Max names in portofolio are %d\n", max_names);
     }
-
+    if (argc == 4) {
+        max_names = atoi(argv[2]);
+        file2 = 1;
+    }
     retcode = readit(argv[1], myTimeSeries);
+    if (retcode) goto BACK;
 
     retcode = eigenCompute(myTimeSeries);
+    if (retcode) goto BACK;
 
     retcode = optimizer(myTimeSeries, max_names);
+    if (retcode) goto BACK;
+
+    free(myTimeSeries);
+
+    if(file2){
+        myTimeSeries = (struct timeSeries *)calloc(1, sizeof(struct timeSeries));
+        
+        retcode = readit(argv[3], myTimeSeries);
+        if (retcode) goto BACK;
+
+        retcode = eigenCompute(myTimeSeries);
+        if (retcode) goto BACK;
+
+        retcode = longshort(myTimeSeries);
+        if (retcode) goto BACK;
+
+        free(myTimeSeries);
+    }
 
 
     /* following code for printing returns and covariance matrix to a file

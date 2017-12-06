@@ -45,3 +45,31 @@ int readit(char *filename, timeSeries *timeSeries)
 	BACK:
 		return readcode;
 }
+
+int readportfolio(const char *portfolioFile, double *positions)
+{
+	int readcode = 0;
+	FILE *portfile = NULL;
+	char buffer[100];
+	int num_assets;
+	portfile = fopen(portfolioFile, "r");
+	if (!portfile){
+		printf("can't open file %s\n", portfolioFile);
+		readcode = 2;
+		goto BACK;
+	}
+
+	fscanf(portfile, "%s", buffer);
+	num_assets = atoi(buffer);
+	for (int i = 0; i < num_assets; i++)
+	{
+		fscanf(portfile, "%s", buffer);
+		fscanf(portfile, "%s", buffer);
+		fscanf(portfile, "%s", buffer);
+		positions[i] = atof(buffer);
+		//printf("%f\n", positions[i]);
+	}
+
+	BACK:
+	return readcode;
+}
